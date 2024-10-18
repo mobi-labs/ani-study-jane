@@ -58,7 +58,7 @@ export default App;
 - `body`의 배경 색이 모두 `red`로 변경되고 2초 후 `window.alert('hi')`가 실행된다.
 - JavaScript 코드를 WebView 내부에 삽입함에 따라 `onMessage` 이벤트가 요구된다.
 
-![image](https://github.com/user-attachments/assets/4c339c38-79a0-4208-b3e8-625e4af444df)
+<img src="https://github.com/user-attachments/assets/4c339c38-79a0-4208-b3e8-625e4af444df" width="30%"/>
 
 > `injectedJavaScriptForMainFrameOnly`
 
@@ -91,11 +91,13 @@ export default App;
 
 ### `injectJavaScript` method
 
-![image](https://github.com/user-attachments/assets/8ff39efa-fe8d-4c4f-a5f4-a22dfeffeeaa)
+<img src="https://github.com/user-attachments/assets/8ff39efa-fe8d-4c4f-a5f4-a22dfeffeeaa" width="30%"/>
+
+![image]()
 
 ### `window.ReactNativeWebView.postMessage` method와 `onMessage` prop
 
-![image](https://github.com/user-attachments/assets/8d8c3107-c5a5-465a-a04f-016ada81adfb)
+<img src="https://github.com/user-attachments/assets/8d8c3107-c5a5-465a-a04f-016ada81adfb" width="30%"/>
 
 ## 커스텀 헤더, 세션, 쿠키로 작업하기
 

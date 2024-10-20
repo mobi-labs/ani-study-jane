@@ -224,6 +224,67 @@ WebView의 로딩이 시작되거나 종료될 때 호출되는 함수
   |앱의 SDK 버전|앱이 실행 가능한 최소 및 최대 Android OS 버전(`minSdkVersion`, `targetSdkVersion`)|
   |앱의 시작 Activity|- 앱이 처음 시작될 때 실행될 `Activity`<br/>- `<intent-filter>`에서 `MAIN`과 `LAUNCHER`를 지정한다.|
 
+### Android 업로드에서 카메라 옵션 사용 가능 여부
+
+- `input` 태그에서 `accept` 속성을 통해 이미지 또는 동영상 파일을 요청하면 WebView는 사용자에게 기기 내에서 카메라를 사용하여 사진을 찍거나 동영상을 촬영하는 옵션을 보여준다. 이를 통해 사용자는 기존에 저장된 파일을 선택하고, 실시간으로 촬영한 이미지나 영상을 업로드할 수 있다.
+
+> 전면/후면 카메라가 `capture` 속성으로 지정되어 있다면?
+
+- `AndroidManifest.xml` 파일에 관련 권한이나 설정이 포함되어 있어야 모든 Android 기기에서 카메라 기능이 안정적으로 동작한다.
+
+  ```xml
+  <queries>
+      <intent>
+          <action android:name="android.media.action.IMAGE_CAPTURE" />
+      </intent>
+  </queries>
+  ```
+
+- `android.media.action.IMAGE_CAPTURE`
+  - 사용자가 카메라 앱에서 사진을 찍은 뒤 앱으로 해당 사진을 반환받을 수 있게 한다.
+- `<input type="file" accept="image/*" capture="environment">`
+  - 사용자가 미리 저장된 파일을 업로드하는 대신 기기 카메라 또는 마이크를 직접 사용해 파일을 입력하도록 요청할 수 있다.
+  - 모바일 기기에서 카메라 또는 마이크를 이용해 실시간으로 파일을 생성할 수 있게 한다.
+  - **value**: `user`(전면 카메라), `environment`(후면 카메라)
+
+> 앱과 카메라 권한
+
+- 카메라 사용 권한이 없는 앱은 외부 앱을 호출하여 카메라를 사용할 수 있다.
+- 하지만 Android에서는 사용자 혼란을 줄이기 위해 카메라에 대한 예외 규정을 두었다.
+  - 앱이 카메라 권한을 요청할 수 있는 상태(`AndroidManifest.xml`에 권한이 선언되었지만 사용자가 아직 권한을 부여하지 않은 상태)라면 앱은 카메라를 사용하는 인텐트(`MediaStore.ACTION_IMAGE_CAPTURE`, `MediaStore.ACTION_VIDEO_CAPTURE`)를 발생시킬 수 없다.
+  - 이런 상황에서 개발자가 파일 업로드를 위해 카메라를 직접 사용해야 한다면 카메라 권한을 먼저 요청해야 한다.
+
+```
+🧐 <intent>?
+: 상위 쿼리에서 어떤 작업 또는 기능을 탐색할 것인지 정의하는 태그
+```
+
+### `static isFileUploadSupported()` 함수로 파일 업로드 지원 여부 확인하기
+
+- Android KitKat(Android 4.4버전의 운영체제)은 `<input type="file"/>`을 사용한 파일 업로드를 지원하지 않는다.
+  - 이는 Android가 Android 4.4 이전에 존재했던 문서화 되지 않은 API들을 제거하고 5.0에서야 새로운 API를 도입했기 때문이다.
+  - [출처](https://github.com/delight-im/Android-AdvancedWebView/issues/4)
+
+```js
+import { WebView } from "react-native-webview";
+
+WebView.isFileUploadSupported().then((res) => {
+  if (res === true) {
+    // 파일 업로드가 지원될 경우
+  } else {
+    // 파일 업로드가 지원되지 않는 경우
+  }
+});
+```
+
+### MacOS에서의 파일 다운로드
+
+앱 Sandbox 내의 `Signing & Capabilites` 탭에서 `User Selected File`에 대한 읽기 권한을 추가해야 한다.
+
+![Mac 설정 이미지](https://user-images.githubusercontent.com/36531255/200541359-dde130d0-169e-4b58-8b2f-205442d76fdd.png)
+
+> **_만약 위의 허가 설정 없이 파일 input을 열려고 하면 WebView에 crash가 발생할 수 있으니 주의하자_**
+
 ## 다중 파일 업로드하기
 
 별도로 설정할 것은 없고 `input` 요소에 `multiple` 속성을 지정하면 단일/다중 파일 선택을 제어할 수 있다.
@@ -246,7 +307,7 @@ WebView의 로딩이 시작되거나 종료될 때 호출되는 함수
 - 최상의 다운로드 환경을 제공하기 위해서는 iOS 13버전 이상이 필요하다.
   - Apple은 iOS 13에서 HTTP response header에 접근하기 위한 API를 추가했다.
   - 이를 통해 HTTP response가 다운로드인지 여부를 판단한다.
-  - iOS
+  - iOS 12 이전 버전에서는 WebView에서 렌더링할 수 없는 MIME 유형만 `onFileDownload`에 대한 호출을 트리거한다.
 
 ```js
 onFileDownload = ({ nativeEvent }) => {
@@ -375,6 +436,44 @@ export default App;
   - JavaSCript는 페이지의 DOM이 생성되기 전에 실행된다.
   - 페이지 로드가 시작되기 전에 초기 설정이나 스타일을 적용하고자 할 때 사용할 수 있다.
 
+#### 플랫폼별 `injectedJavaScript`의 동작 원리
+
+각 플랫폼별로 JavaScript 코드가 WebView에 주입되는 방식을 알아보자.
+
+> iOS
+
+- **BEFORE** (8.2.0 버전 이전)
+  - iOS에서 WebView는 `evaluateJavaScript:completionHandler` 메서드를 사용하여 `injectedJavaScript`를 실행했다.
+  - 이 메서드는 JavaScript 코드가 실행된 후 결과값을 반환하거나 실패할 경우 경고를 콘솔에 기록했다.
+- **AFTER** (8.2.0 버전 이후)
+  - `WKUserScript`를 사용해 JavaScript를 WebView에 주입한다.
+  - **injection time**은 `WKUserScriptInjectionTimeAtDocumentEnd`로 설정되어 문서가 모두 로드된 후 JavaScript가 주입된다.
+  - 이전 버전에서와는 다르게, `injectedJavaScript`는 더이상 평가값을 반환하지 않고, 콘솔에 경고도 기록하지 않는다.
+  - 만약 앱이 이런 기록에 의존하고 있었다면 이전 방식으로 마이그레이션을 고려할 필요가 있다. [migration 관련 안내](https://github.com/react-native-webview/react-native-webview/pull/1119#issuecomment-574919464)
+
+> Android
+
+- `injectedJavaScript`는 `evaluateJavascriptWithFallback` 메서드를 사용하여 Android WebView에서 JavaScript 코드를 실행한다.
+- 이 메서드를 통해 기본적으로는 `evaluateJavaScript` 메서드를 사용하되 실패 시 **fallback**을 사용해 코드를 실행한다.
+- **_🧐 왜 fallback 코드가 필요할까?_**
+  - `evaluateJavaScript`는 WebView 내에서 비동기적으로 JavaScript 코드를 실행하고 그 결과를 콜백함수로 전달하는 메서드이다.
+  - 실행 결과는 JavaScript에서 JSON 형식으로 반환된다.
+  - 이 메서드는 Android WebView에서 기본으로 제공하는 메서드이지만 Android 4.4(KitKat) 이상에서만 동작한다.
+  - 하위 버전에서의 호환성을 유지하기 위해서는 fallback 로직이 구현되어 있어야 한다.
+  - 보통 fallback 로직은 `loadUrl` 메서드를 사용해 JavaScript 코드를 실행하도록 구현한다. (예: `webView.loadUrl("javascript:alert('Hello World!')");`)
+  - 결과적으로, 이 메서드는 최신 기기에서는 `evaluateJavaScript`, 구형 기기에서는 대체 방식인 `loadUrl`을 사용하여 JavaScript 코드를 실행한다.
+
+> Windows
+
+- `injectedJavaScript`는 `InvokeScriptAsync` 메서드를 사용해 WinRT/C++ WebView에서 JavaScript를 실행한다.
+- **WinRT/C++**
+  - Windows Runtime: Windows 8 이후에 도입된 모던 Windows 애플리케이션 개발을 위한 API 환경
+  - C++, C#, JavaScript 등 다양한 언어를 지원해 Windows Store 앱과 UWP(Universal Windows Platform) 앱을 개발할 수 있게 한다.
+  - WinRT/C++란 WinRT API를 C++을 사용해 활용하는 방식을 의미한다.
+- `InvokeScriptAsync`
+  - WinRT 환경에서 사용되는 메서드. Windows WebVIew에서 JavaScript 코드를 비동기적으로 실행하기 위해 사용한다.
+  - UWP 앱에서 WebView 내의 HTML 페이지에 포함된 JavaScript 함수를 호출하거나 직접 JavaScript 코드를 실행한다.
+
 ### `injectedJavaScriptBeforeContentLoaded` prop
 
 ### `injectedJavaScriptObject` prop
@@ -390,3 +489,102 @@ export default App;
 ## 커스텀 헤더, 세션, 쿠키로 작업하기
 
 ## 페이지 전환 제스처와 버튼 구현하기
+
+iOS에서는 스와이프 제스쳐, Android에서는 하드웨어의 뒤로가기 버튼 및 제스처를 통해 기존 모바일 페이지에 대한 navigation을 지원할 수 있다.
+
+### iOS
+
+`allowbackforwardnavigationgestures` prop만 사용하면 간단하게 구현할 수 있다.
+
+> `allowsBackForwardNavigationGestures`
+
+가로 스와이프 제스처를 사용해 이전/다음 페이지로 이동하는 기능을 허용할지 여부를 설정하는 속성
+
+|   Type    | Required |  Platform  |
+| :-------: | :------: | :--------: |
+| `boolean` |    X     | iOS, macOS |
+
+- `true`: 가로로 스와이프하여 뒤로/앞으로 가기 navigation 동작을 할 수 있다.
+- `false`: **default**. 별도로 설정하지 않으면 해당 제스처를 통한 navigation 기능이 동작하지 않는다.
+
+### Android
+
+- `BackHandler.addEventListener`를 사용하여 뒤로 가기 버튼을 처리하고 이를 WebView 상에서 이전 페이지로 이동하는 `goBack` 함수와 연결해야 한다.
+- 함수형 React 컴포넌트에서는 `useRef`와 `useEffect`를 사용하여 뒤로 가기 버튼을 누르면 이전 페이지로 이동하도록 구현해야 한다.
+
+```js
+import React, { useCallback, useEffect, useState, useRef } from "react";
+import { BackHandler, Platform } from "react-native";
+
+const [canGoBack, setCanGoBack] = useState(false);
+const webViewRef = useRef(null);
+const onAndroidBackPress = useCallback(() => {
+  if (canGoBack) {
+    webViewRef.current?.goBack();
+    return true; // default 동작 방지 (앱 종료)
+  }
+  return false;
+}, [canGoBack]);
+
+useEffect(() => {
+  if (Platform.OS === "android") {
+    BackHandler.addEventListener("hardwareBackPress", onAndroidBackPress);
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", onAndroidBackPress);
+    };
+  }
+}, []);
+
+return (
+  <>
+    <WebView
+      ref={webViewRef}
+      onLoadProgress={(event) => {
+        // WebView에 해당 prop을 추가하면 된다.
+        setCanGoBack(event.nativeEvent.canGoBack);
+      }}
+    />
+  </>
+);
+```
+
+> `onLoadProgress`
+
+`WebView` 컴포넌트가 로드 상태가 변경될 때 호출되는 함수이다.
+
+|    Type    | Required |      Platform       |
+| :--------: | :------: | :-----------------: |
+| `function` |    X     | iOS, macOS, Android |
+
+- `nativeEvent`
+
+  - 웹 페이지 로드와 관련된 여러 속성을 제공하는 이벤트 객체이다.
+  - `onLoadProgress`로 전달되는 함수는 `SyntheticEvent`를 인수로 받고, 이 이벤트에는 `nativeEvent`가 포함되어 있다.
+  - `SyntheticEvent`
+    - 브라우저의 네이티브 이벤트를 추상화한 이벤트 객체
+    - 브라우저마다 다른 이벤트 처리 방식을 통일해 일관된 이벤트 처리를 제공한다.
+  - `nativeEvent` 구성 요소
+    - `canGoBack`
+    - `canGoForward`
+    - `loading`
+    - `progress`
+    - `target`
+    - `title`
+    - `url`
+
+- 코드 예시
+  ```js
+  <WebView
+    source={{ uri: "https://a-ni.com" }}
+    onLoadProgress={({ nativeEvent }) => {
+      this.loadingProgress = nativeEvent.progress;
+    }}
+  />
+  ```
+
+## 하드웨어 무음 스위치
+
+- iOS에서 오디오는 무음 스위치에 따라 음소거될 수 있지만, 비디오는 이 스위치의 영향을 받지 않는다.
+  - 오디오는 `ignoreSilentHardwardSwitch` 매개변수를 `true`로 설정하지 않는 이상 하드웨어 무음 스위치가 켜져 있으면 음소거 된다.
+  - 비디오는 하드웨어 무음 스위치를 항상 무시한다.
+- Android에는 별도의 물리적 무음 스위치가 존재하지 않고 소리 모드를 설정하는 기능이 존재하므로 이러한 차이가 존재하지 않는다.

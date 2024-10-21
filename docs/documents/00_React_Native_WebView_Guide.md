@@ -680,6 +680,133 @@ const App = () => {
 
 ## 커스텀 헤더, 세션, 쿠키로 작업하기
 
+### 커스텀 헤더 설정하기
+
+- React Native WebView에서는 아래처럼 간단하게 커스텀 헤더를 설정할 수 있다.
+- 하지만 이렇게 설정할 경우 첫 번째 로드에서만 HTTP 헤더를 설정하고 그 이후의 페이지 네이게이션에 대해서는 유지하지 않는다.
+
+```js
+<WebView
+  source={{
+    uri: "http://a-ni.com",
+    headers: {
+      "my-custom-header-key": "my-custom-header-value",
+    },
+  }}
+/>
+```
+
+- 이 문제를 해결하기 위해, 현재 URL을 추적하고 새로운 페이지 로드를 가로채 직접 해당 페이지로 이동시켜 헤더 설정이 지속되도록 처리할 수 있다.
+- 아래와 같이 구현하면 웹 페이지를 로드하고 새로운 URL로의 탐색이 있을 때 헤더를 유지하며 페이지를 업데이트한다.
+
+```js
+const CustomHeaderWebView = (props) => {
+  const { uri, onLoadStart, ...restProps } = props;
+  const [currentURI, setURI] = useState(props.source.uri);
+
+  const newSource = { ...props.source, uri: currentURI };
+
+  return (
+    <WebView
+      {...restProps}
+      source={newSource}
+      onShouldStartLoadWithRequest={(request) => {
+        // 현재 URI를 로드하는 경우 로드를 허용한다.
+        if (request.url === currentURI) return true;
+        // 새로운 URL을 로드할 경우 새로운 URL로 상태를 변경하고 로드를 차단하기 위해 false를 반환한다.
+        setURI(request.url);
+        return false;
+      }}
+    />
+  );
+};
+
+<CustomHeaderWebView
+  source={{
+    uri: "http://a-ni.com",
+    headers: {
+      "my-custom-header-key": "my-custom-header-value",
+    },
+  }}
+/>;
+```
+
+> `onShouldStartLoadWithRequest`
+
+- 모든 웹뷰 요청을 가로채 사용자 정의 방식으로 처리할 수 있는 함수
+
+|  Type  | Required |      Platform       |
+| :----: | :------: | :-----------------: |
+| `bool` |    X     | iOS, Android, macOS |
+
+- `true`를 반환할 경우 요청의 로드를 계속 진행하고, `false`를 반환하면 로드를 중지한다.
+- 코드 예시
+  ```js
+  <WebView
+    source={{ uri: "https://a-ni.com" }}
+    onShouldStartLoadWithRequest={(request) => {
+      // 이 웹사이트에서만 네비게이션을 허용한다.
+      return request.url.startsWith("https://mobia.com");
+    }}
+  />
+  ```
+- `request` 객체를 구성하는 속성들
+  - `title`, `url`, `loading`, `target`, `canGoBack`, `canGoForward`
+  - `lockIdentifier`
+    - `request` 식별자. WebView 요청 간 충돌을 방지한다.
+  - `mainDocumentURL` (iOS only)
+    - 요청된 페이지의 메인 문서 URL. 현재 로드된 문서와의 관계를 나타내기 위해 사용한다.
+  - `navigationType` (iOS only)
+  - `isTopFrame` (iOS only)
+    - 프레임 구조에서 현재 요청의 위치를 알려준다. (최상위 프레임인지)
+  - `hasTargetFrame` (iOS only)
+    - 요청이 특정 프레임을 대상으로 하는지 여부
+    - 네비게이션이 새 창이나 탭을 대상으로 하면 `false`, 아니면 `true`여야 한다.
+    - `onOpenWindow` 이벤트가 WebView에 등록되어 있는 경우 `false`로 설정되어 있으면 이 이벤트에 의해 가로채지기 때문에 항상 **`true`**로 설정되어 있어야 한다.
+      - 새 창 열기 요청이 `onOpenWindow` 이벤트에 의해 처리되기 때문이다!
+
+### 쿠키 관리하기
+
+- [react-native-cookies](https://github.com/react-native-cookies/cookies)를 사용해 React Native 측에 쿠키를 설정해둘 수 있다.
+- 이때 `sharedCookiesEnabled` prop 또한 활성화할 수 있다.
+
+  ```js
+  const App = () => {
+    return (
+      <WebView
+        source={{ uri: "http://a-ni.com" }}
+        sharedCookiesEnabled={true}
+      />
+    );
+  };
+  ```
+
+- 만약 WebView 자체에서 커스텀 쿠키를 전송하고 싶다면 커스텀 헤더에서 이를 처리할 수 있다.
+  ```js
+  const App = () => {
+    return (
+      <WebView
+        source={{
+          uri: "http://a-ni.com",
+          headers: {
+            Cookie: "cookie1=asdf; cookie2=dfasdfdas",
+          },
+        }}
+        sharedCookiesEnabled={true}
+      />
+    );
+  };
+  ```
+  - 이렇게 설정된 쿠키는 위의 커스텀 헤더 관련 설명에서 언급한 것처럼 별도로 매 페이지의 로드마다 커스텀 헤더를 설정하지 않는 이상 첫 번째 request에서만 전달되니 주의하자!
+
+> `sharedCookiesEnabled`
+
+|  Type  | Required |  Platform  |
+| :----: | :------: | :--------: |
+| `bool` |    X     | iOS, macOS |
+
+모든 WebView 로드 request에 대해 `[NSHTTPCookieStorage sharedHTTPCookieStorage]`의 공유 쿠키를 사용하려면 `true`로 설정해야 한다. 기본값은 `false`이다.
+
 ## 페이지 전환 제스처와 버튼 구현하기
 
 iOS에서는 스와이프 제스쳐, Android에서는 하드웨어의 뒤로가기 버튼 및 제스처를 통해 기존 모바일 페이지에 대한 navigation을 지원할 수 있다.

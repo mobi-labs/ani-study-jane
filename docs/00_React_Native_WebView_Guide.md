@@ -476,13 +476,205 @@ export default App;
 
 ### `injectedJavaScriptBeforeContentLoaded` prop
 
+- 최초로 웹 페이지가 로드되기 **전에** 실행되는 스크립트
+- 페이지가 reload 되거나 navigation을 사용하여 이동하더라도 단 한 번만 실행된다.
+- 웹 코드가 실행되기 전에 window, localStorage, document에 무언가를 주입할 때 유용하다.
+- 예시 코드
+
+  ```js
+  import React, { Component } from "react";
+  import { View } from "react-native";
+  import { WebView } from "react-native-webview";
+
+  const App = () => {
+    const runFirst = `
+        window.isNativeApp = true;
+        true; // 이 값을 반환하지 않는다면 쥐도새도 모르게 실패하는 상황이 생길 수 있다..!🙄
+      `;
+    return (
+      <View style={{ flex: 1 }}>
+        <WebView
+          source={{
+            uri: "https://github.com/mobi-labs/webview-jane",
+          }}
+          injectedJavaScriptBeforeContentLoaded={runFirst}
+        />
+      </View>
+    );
+  };
+  ```
+
+  - 위 코드는 페이지가 로드되기 전에 `runFirst` 문자열 내부의 JavaScript` 코드를 실행한다.
+  - 그 결과 웹 코드가 실행되기 전에 `window.isNativeApp` 값이 `true`로 설정된다.
+
+#### ⚠️ **_WARNING_**
+
+- Android에서는 이 prop이 동작하지 않을 수도 있으므로 `injectedJavaScriptObject`를 사용하는 방식을 고려해보자.
+- `injectedJavaScriptBeforeContentLoadedForMainFrameOnly: false`
+  - 지정 플랫폼에서 지원하는 경우 이 설정은 JavaScript 코드의 주입이 상단 프레임 뿐만 아니라 모든 프레임에서 발생하게 된다.
+  - iOS나 macOS에서 위의 설정을 지원함에도 불구하고, 페이지 생명주기의 관점에서 `iframe`에 JS를 주입하는 것이 실제로 가능한지 확실하지 않다.
+  - 따라서 위의 설정이 `false`로 되어 있을 때 이 prop의 예상 동작에 의존하는 것은 권장되지 않는다.
+
+#### 플랫폼별 `injectedJavaScriptBeforeContentLoaded`의 동작 원리
+
+> iOS
+
+- 8.2.0 버전 이전에는 `evaluateJavaScript:completionHandler:`라는 메서드를 사용했다.
+- 지금은 `WKUserScriptInjectionTimeAtDocumentStart`라는 injection time과 함께 `WKUserScript `를 사용한다.
+- `injectedJavaScriptBeforeContentLoaded`는 더이상 평가 값을 반환하거나 콘솔에 경고를 출력하지 않는다.
+
+> Android
+
+- Android WebView에서 `evaluateJavascriptWithFallback` 메서드를 실행한다.
+- 웹 페이지를 새로 로드하거나 이동(`loadUrl` 메서드 호출) 시 그 이전에 정의된 JavaScript 상태(전역 변수, 함수 등)는 사라진다.
+  - `Build.VERSION_CODES.N` 이전
+    - WebView에서 새 페이지를 로드해도 이전에 정의된 JS 상태가 그대로 유지되었다.
+    - 예: 페이지 로드 전 `window.someVariable = 'hello'`라는 JS 코드를 실행해다면 이 값이 새로 로드된 페이지에서도 유지되었다.
+  - `Build.VERSION_CODES.N` 이후
+    - `Build.VERSION_CODES.N`: Android에서 **Nougat** 버전을 나타내는 코드 (Android 7.0 및 7.1 버전)
+    - `loadUrl(java.lang.String)`로 새로운 페이지를 로드하면 이전에 WebView에 정의된 **전역 변수나 함수가 초기화** 된다.
+  - JS 객체 및 상태를 유지하기 위해서는 Android Native API인 `addJavascriptInterface(Object, String)`을 대신 사용해야 한다.
+    - Android Native 코드와 JavaScript 간 상호작용을 가능하게 해주는 API
+    - WebView가 페이지를 로드할 때마다 JavaScript 객체가 초기화되지 않고 계속 유지될 수 있다
+
 ### `injectedJavaScriptObject` prop
+
+- Android Race Condition으로 인해 더 신뢰할 수 있는 속성인 `injectedJavaScriptObject`가 추가되었다.
+  - **Android Race Condition**: WebView에서 페이지가 로드되는 중간에 JavaScript 코드의 실행 타이밍이 엇갈리거나 제대로 동작하지 않는 문제 상황
+- 기존처럼 자유롭게 JavaScript 코드를 실행하는 것은 불가능하지만, 페이지 로드 전 WebView에서 실행되는 JavaScript 객체를 만들어 제공할 수 있다.
+
+```js
+import React, { Component } from "react";
+import { View } from "react-native";
+import { WebView } from "react-native-webview";
+
+const App = () => {
+  return (
+    <View style={{ flex: 1 }}>
+      <WebView
+        source={{
+          html: HTML,
+        }}
+        injectedJavaScriptObject={{ customValue: "myCustomValue" }}
+      />
+    </View>
+  );
+};
+```
+
+#### 👩‍🏫 **_NOTE_**
+
+- `ReactNativeWebView.injectedObjectJson()`은 `injectedJavaScriptObject`에 전달된 **JSON으로 인코딩된 객체**를 반환한다.
+- 이 객체의 속성에 접근하려면 반드시 `JSON.parse`로 변환해야 한다.
+- 이 객체는 `undefined`일 수도 있으니 에러 처리를 고려해야 한다.
+
+```html
+<html>
+  <head>
+    <script>
+      window.onload = (event) => {
+        if (window.ReactNativeWebView.injectedObjectJson()) {
+          document.getElementById("output").innerHTML = JSON.parse(
+            window.ReactNativeWebView.injectedObjectJson()
+          ).customValue;
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <p id="output">undefined</p>
+  </body>
+</html>
+```
 
 ### `injectJavaScript` method
 
+`injectedJavaScript`는 편리하긴 하지만 **한 번만 실행된다**는 단점이 있어서, react-native-webview에서는 WebView의 `ref`에 `injectJavaScript` 메서드를 제공한다.
+
+- 이를 통해 WebView `ref`에서 필요할 때마다 JavaScript 코드를 실행할 수 있다.
+
+```js
+import React, { Component } from "react";
+import { View } from "react-native";
+import { WebView } from "react-native-webview";
+
+const App = () => {
+  const run = `
+      document.body.style.backgroundColor = 'blue';
+      true;
+    `;
+
+  setTimeout(() => {
+    this.webref.injectJavaScript(run);
+  }, 3000);
+
+  return (
+    <View style={{ flex: 1 }}>
+      <WebView
+        ref={(r) => (this.webref = r)}
+        source={{
+          uri: "https://github.com/mobi-labs/webview-jane",
+        }}
+      />
+    </View>
+  );
+};
+```
+
+이 코드는 3초 후 배경을 파란색으로 변경한다.
+
 <img src="https://github.com/user-attachments/assets/8ff39efa-fe8d-4c4f-a5f4-a22dfeffeeaa" width="30%"/>
 
+#### 플랫폼별 `injectJavaScript`의 동작 원리
+
+> iOS
+
+- WebView의 `evaluateJS:andThen:`을 호출한다.
+
+> Android
+
+- Android WebView의 `evaluateJavascriptWithFallback` 메소드를 호출한다.
+
 ### `window.ReactNativeWebView.postMessage` method와 `onMessage` prop
+
+웹 페이지에 JavaScript를 보내는 것은 유용하지만, 만약 웹 페이지가 다시 React Native 코드와 통신하고자 할 때는 어떻게 해야 할까? 이럴 때 사용할 수 있는 것이 바로 `onMessage` prop과 `window.ReactNativeWebView.postMessage` 메소드이다.
+
+- `onMessage` 또는 `window.ReactNativeWebView.postMessage` 메소드가 웹 페이지 내에 주입되지 않도록 설정해야 한다.
+- `window.ReactNativeWebView.postMessage`는 오직 하나의 문자열 인수만 허용한다.
+
+```js
+import React, { Component } from "react";
+import { View } from "react-native";
+import { WebView } from "react-native-webview";
+
+const App = () => {
+  const html = `
+      <html>
+      <head></head>
+      <body>
+        <script>
+          setTimeout(function () {
+            window.ReactNativeWebView.postMessage("Hello!")
+          }, 2000)
+        </script>
+      </body>
+      </html>
+    `;
+
+  return (
+    <View style={{ flex: 1 }}>
+      <WebView
+        source={{ html }}
+        onMessage={(event) => {
+          alert(event.nativeEvent.data);
+        }}
+      />
+    </View>
+  );
+};
+```
+
+이 코드는 아래와 같은 Alert을 호출한다.
 
 <img src="https://github.com/user-attachments/assets/8d8c3107-c5a5-465a-a04f-016ada81adfb" width="30%"/>
 

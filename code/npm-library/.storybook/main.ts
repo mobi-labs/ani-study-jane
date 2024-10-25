@@ -7,7 +7,7 @@ const config: StorybookConfig = {
     '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@chromatic-com/storybook',
-    '@storybook/addon-interactions',
+    '@storybook/addon-interactions',"@storybook/preset-scss"
   ],
   framework: {
     name: '@storybook/nextjs',
@@ -17,5 +17,8 @@ const config: StorybookConfig = {
     autodocs: 'tag',
   },
   staticDirs: ['../public'],
+  core: {
+		"builder": "@storybook/builder-webpack5"
+	}
 }
 export default config

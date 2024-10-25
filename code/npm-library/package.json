@@ -26,6 +26,8 @@
     "./src/**/*.stories.tsx"
   ],
   "dependencies": {
+    "@storybook/nextjs": "^8.3.6",
+    "@storybook/react": "^8.3.6",
     "rollup-plugin-peer-deps-external": "^2.2.4"
   }
 }

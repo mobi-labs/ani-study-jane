@@ -1,4 +1,14 @@
 {
+  "name": "npm-library-deploy-test-for-butter",
+	"version": "0.0.0",
+	"main": "./dist/index.js",
+	"module": "./dist/index.es.js",
+	"browser": "./dist/index.umd.js",
+	"types": "./dist/index.d.ts",
+	"private": true,
+	"script": {
+		"build": "rollup -c"
+	},
   "compilerOptions": {
     "target": "es5",
     "esModuleInterop": true,

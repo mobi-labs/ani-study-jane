@@ -1,14 +1,14 @@
 {
   "name": "npm-library-deploy-test-for-butter",
-	"version": "0.0.0",
-	"main": "./dist/index.js",
-	"module": "./dist/index.es.js",
-	"browser": "./dist/index.umd.js",
-	"types": "./dist/index.d.ts",
-	"private": true,
-	"script": {
-		"build": "rollup -c"
-	},
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.es.js",
+  "browser": "./dist/index.umd.js",
+  "types": "./dist/index.d.ts",
+  "private": true,
+  "script": {
+    "build": "rollup -c"
+  },
   "compilerOptions": {
     "target": "es5",
     "esModuleInterop": true,
@@ -36,8 +36,15 @@
     "./src/**/*.stories.tsx"
   ],
   "dependencies": {
+    "@mui/icons-material": "^6.1.5",
     "@storybook/nextjs": "^8.3.6",
     "@storybook/react": "^8.3.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "rollup-plugin-peer-deps-external": "^2.2.4"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1"
   }
 }

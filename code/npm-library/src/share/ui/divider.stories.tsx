@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
 import { Divider } from './divider'
+import React from 'react'
 
 const meta = {
   title: 'share/ui/divider',

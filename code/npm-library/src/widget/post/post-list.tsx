@@ -1,5 +1,6 @@
 import { PostType } from '@/entities/model'
 import { OnePost } from '@/widget/post/one-post'
+import React from 'react'
 
 type Props = {
   postList: PostType[]

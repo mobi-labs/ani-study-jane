@@ -3,6 +3,7 @@ import { ChatOutlined, FavoriteBorderOutlined } from '@mui/icons-material'
 import { PostType } from '@/entities/model'
 import { cn } from '@/share/libs'
 import { Divider, Tag } from '@/share/ui'
+import React from 'react'
 
 type Props = {
   post: PostType

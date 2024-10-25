@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .h1 {
+    @apply font-pretendard text-h1;
+  }
+  .h2 {
+    @apply font-pretendard text-h2;
+  }
+  .h3 {
+    @apply font-pretendard text-h3;
+  }
+  .subtitle1 {
+    @apply font-pretendard text-subtitle1;
+  }
+  .subtitle2 {
+    @apply font-pretendard text-subtitle2;
+  }
+  .subtitle3 {
+    @apply font-pretendard text-subtitle3;
+  }
+  .subtitle4 {
+    @apply font-pretendard text-subtitle4;
+  }
+  .body1 {
+    @apply font-pretendard text-body1;
+  }
+  .body2 {
+    @apply font-pretendard text-body2;
+  }
+  .body3 {
+    @apply font-pretendard text-body3;
+  }
+  .body4 {
+    @apply font-pretendard text-body4;
+  }
+  .body5 {
+    @apply font-pretendard text-body5;
+  }
+  .body6 {
+    @apply font-pretendard text-body6;
+  }
+  .caption1 {
+    @apply font-pretendard text-caption1;
+  }
+  .caption2 {
+    @apply font-pretendard text-caption2;
+  }
+  .caption3 {
+    @apply text-caption3 font-pretendard;
+  }
+  .caption4 {
+    @apply text-caption4 font-pretendard;
+  }
+  .caption5 {
+    @apply text-caption5 font-pretendard;
+  }
+}

@@ -5,7 +5,7 @@
   "module": "./dist/index.es.js",
   "browser": "./dist/index.umd.js",
   "types": "./dist/index.d.ts",
-  "private": true,
+  "private": false,
   "script": {
     "build": "rollup -c"
   },

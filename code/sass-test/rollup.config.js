@@ -5,65 +5,50 @@
  * @since 2022.06.06 Mon 17:44:31
  */
 
-import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
-import { nodeResolve } from "@rollup/plugin-node-resolve";
+import resolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 import peerDepsExternal from "rollup-plugin-peer-deps-external";
-import postcss from "rollup-plugin-sass";
+import scss from "rollup-plugin-sass";
 import { createRequire } from "node:module";
 import { terser } from "rollup-plugin-terser";
-
-const extensions = ["js", "jsx", "ts", "tsx", "mjs"];
+import dts from "rollup-plugin-dts";
 
 const requireFile = createRequire(import.meta.url);
 const pkg = requireFile("./package.json");
 
 const config = [
   {
-    external: [/node_modules/],
-    input: "./src/index.ts",
+    input: "src/index.ts",
     output: [
       {
-        dir: "./dist",
+        file: pkg.main,
         format: "cjs",
-        preserveModules: true,
-        preserveModulesRoot: "src",
+        sourcemap: true,
       },
       {
         file: pkg.module,
-        format: "es",
-      },
-      {
-        name: pkg.name,
-        file: pkg.browser,
-        format: "umd",
+        format: "esm",
+        sourcemap: true,
       },
     ],
     plugins: [
-      nodeResolve({ extensions }),
-      babel({
-        exclude: "node_modules/**",
-        extensions,
-        include: ["src/**/*"],
-      }),
-      commonjs({ include: "node_modules/**" }),
       peerDepsExternal(),
-      typescript({ tsconfig: "./tsconfig.json" }),
-      postcss({
-        extract: false,
-        inject: true,
-        output: true,
-        outputStyle: "compressed",
-        modules: true,
-        sourceMap: false,
-        use: ["sass"],
-        options: {
-          includePaths: ["src"],
-        },
+      resolve(),
+      commonjs(),
+      typescript(),
+      scss({
+        include: ["src/**/*.scss"],
+        output: "dist/bundle.css",
       }),
       terser(),
     ],
+  },
+  {
+    input: "dist/index.d.ts",
+    output: [{ file: "dist/index.d.ts", format: "es" }],
+    plugins: [dts()],
+    external: [/\.s[ac]ss$/],
   },
 ];
 

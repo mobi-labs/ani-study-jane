@@ -1,7 +1,7 @@
 {
   "name": "sass-npm-library-test",
   "description": "npm library 생성을 위한 테스트 버전",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "type": "module",
   "main": "index.tsx",
   "module": "./dist/index.js",

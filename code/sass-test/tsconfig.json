@@ -17,7 +17,7 @@
     "removeComments": true,
     "typeRoots": ["node_modules/@types", "node_modules/your-package-name"]
   },
-  "include": ["./src"],
+  "include": ["./src/**/*"],
   "exclude": [
     "./dist",
     "./node_modules",

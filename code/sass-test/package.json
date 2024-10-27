@@ -4,8 +4,8 @@
   "version": "0.1.1",
   "type": "module",
   "module": "dist/index.js",
-  "browser": "dist/index.umd.js",
   "types": "dist/index.d.ts",
+  "browser": "dist/index.umd.js",
   "files": [
     "dist/*"
   ],

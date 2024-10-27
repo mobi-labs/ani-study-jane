@@ -11,7 +11,6 @@ import typescript from "@rollup/plugin-typescript";
 import peerDepsExternal from "rollup-plugin-peer-deps-external";
 import scss from "rollup-plugin-sass";
 import { createRequire } from "node:module";
-import { terser } from "rollup-plugin-terser";
 import dts from "rollup-plugin-dts";
 
 const requireFile = createRequire(import.meta.url);
@@ -41,7 +40,6 @@ const config = [
         include: ["src/**/*.scss"],
         output: "dist/bundle.css",
       }),
-      terser(),
     ],
   },
   {

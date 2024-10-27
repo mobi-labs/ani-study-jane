@@ -1,70 +1,49 @@
-# Getting Started with Create React App
+## rollup.js 사용하여 프로젝트 빌드하기
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+1. **_RollupError: Node tried to load your configuration ..._**
 
-## Available Scripts
+```bash
+[!] RollupError: Node tried to load your configuration as an ES module even though it is likely CommonJS. To resolve this, change the extension of your configuration to ".cjs" or pass the "--bundleConfigAsCjs" flag.
 
-In the project directory, you can run:
+Original error: require is not defined in ES module scope, you can use import instead
+This file is being treated as an ES module because it has a '.js' file extension and 'C:\data\ani-study-jane\code\sass-test\package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+```
 
-### `npm start`
+```bash
+[!] RollupError: Node tried to load your configuration file as CommonJS even though it is likely an ES module. To resolve this, change the extension of your configuration to ".mjs", set "type": "module" in your package.json file or pass the "--bundleConfigAsCjs" flag.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Original error: Cannot use import statement outside a module
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- `rollup.config` 파일의 확장자를 `.js`, `.mjs`, `.cjs`로 모두 바꾸어 봤으나 해결되지 않았습니다.
+- 문제는 `rollup.config.js` 내에서 `package.json` 파일을 import 해오는 코드였습니다.
 
-### `npm test`
+```js
+// require문 사용
+const pkg = require("./package.json");
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- 위의 코드를 아래의 방식으로 수정하여 문제를 해결하였습니다.
 
-### `npm run build`
+```js
+import { createRequire } from "node:module";
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+const requireFile = createRequire(import.meta.url);
+const pkg = requireFile("./package.json");
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. **_Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0._**
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **BEFORE**: `import postcss from "rollup-plugin-postcss"`
+- **AFTER**: `import sass from "rollup-plugin-sass"`
 
-### `npm run eject`
+3. **_RollupError: You must specify "output.file" or "output.dir" for the build._**
+   `package.json`에 아래의 설정을 추가하여 해결하였습니다.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```json
+{
+  "module": "./dist/index.es.js",
+  "browser": "./dist/index.umd.js",
+  "types": "./dist/index.d.ts"
+}
+```

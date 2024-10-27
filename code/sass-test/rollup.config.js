@@ -56,6 +56,9 @@ const config = [
         modules: true,
         sourceMap: false,
         use: ["sass"],
+        options: {
+          includePaths: ["src"],
+        },
       }),
     ],
   },

@@ -1,11 +1,19 @@
 {
   "name": "sass-npm-library-test",
   "description": "npm library 생성을 위한 테스트 버전",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "type": "module",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "browser": "dist/index.umd.js",
+  "main": "index.tsx",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": "./dist/index.umd.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
     "dist/*"
   ],

@@ -1,4 +1,4 @@
 import "./index.scss";
-import { Button } from "./stories/Button";
+import { Button } from "./components/Button";
 
 export { Button };

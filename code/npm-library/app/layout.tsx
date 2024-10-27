@@ -1,3 +1,4 @@
+import React from 'react'
 import './globals.css'
 import '@/share/styles/font.css'
 

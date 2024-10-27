@@ -1,4 +1,6 @@
 import Image from 'next/image'
+import React from 'react'
+import './icon-box.sass'
 
 type Props = {
   type: 'default' | 'home' | 'chat'
@@ -8,20 +10,20 @@ type Props = {
 export function IconBox({ icon = 0, type = 'default' }: Props) {
   switch (icon) {
     case 0:
-      return <div />
+      return <div className="icon-box__empty" />
     case 1:
       return (
-        <div className="relative h-5 w-5">
+        <div className="icon-box__icon">
           <Image fill src="/svg/more-vert.svg" alt="더보기 아이콘" />
         </div>
       )
     case 2:
       return (
-        <div className="flex items-start gap-4 ">
-          <div className="relative h-5 w-5">
+        <div className="icon-box__group">
+          <div className="icon-box__icon">
             <Image fill src="/svg/search.svg" alt="검색 아이콘" />
           </div>
-          <div className="relative h-5 w-5">
+          <div className="icon-box__icon">
             {type === 'home' ? (
               <Image fill src="/svg/more-vert.svg" alt="더보기 아이콘" />
             ) : (
@@ -30,5 +32,7 @@ export function IconBox({ icon = 0, type = 'default' }: Props) {
           </div>
         </div>
       )
+    default:
+      return <></>;
   }
 }

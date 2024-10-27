@@ -1,5 +1,6 @@
-import { generatePost } from '@/entities/mock/data'
-import { Post } from '@/view'
+import React from 'react'
+import { generatePost } from '../../src/entities/mock/data'
+import { Post } from '../../src/view'
 
 export const metadata = {
   title: 'App Router',

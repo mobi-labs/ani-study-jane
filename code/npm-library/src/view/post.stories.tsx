@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { generatePost } from '@/entities/mock/data/generate-post'
-import { Post } from '@/view/post'
-import { MobileLayout } from '@/widget/layout'
+import { generatePost } from '../entities/mock/data'
+import { Post } from './post'
+import { MobileLayout } from '../widget/layout'
+import React from 'react'
 
 const meta = {
   title: 'page/view',

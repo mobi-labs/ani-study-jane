@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { AppleStatusBar } from '@/widget/layout'
+import { AppleStatusBar } from '../../widget/layout'
 
 const meta = {
   title: 'widget/layout/apple-status-bar',

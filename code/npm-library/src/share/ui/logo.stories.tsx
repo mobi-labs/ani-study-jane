@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { Logo } from '@/share/ui/logo'
+import { Logo } from './logo'
 
 const meta = {
   title: 'share/ui/Logo',

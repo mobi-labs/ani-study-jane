@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { generatePost } from '@/entities/mock/data'
-import { OnePost } from '@/widget/post/one-post'
+import { generatePost } from '../../entities/mock/data/generate-post'
+import { OnePost } from './one-post'
 
 const post = generatePost(1)[0]
 

@@ -1,5 +1,6 @@
-import { PostType } from '@/entities/model'
-import { PostList } from '@/widget/post'
+import { PostType } from '../entities/model'
+import { PostList } from '../widget/post'
+import React from 'react'
 
 type Props = {
   postList: PostType[]

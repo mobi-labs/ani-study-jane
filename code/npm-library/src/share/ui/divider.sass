@@ -1,0 +1,33 @@
+$default-width: 393px;
+$default-thickness: 1px;
+$bolder-thickness: 0.75rem;
+$divider-color: #e5e5e5;
+
+.divider {
+  background-color: $divider-color;
+
+  &--default-width {
+    width: $default-width;
+  }
+
+  &--full-width {
+    width: 100%;
+  }
+
+  &--default-thickness {
+    height: $default-thickness;
+  }
+
+  &--bolder-thickness {
+    height: $bolder-thickness;
+  }
+}
+
+.container {
+  display: flex;
+  height: 5rem;
+  width: 700px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e5e7eb;
+}

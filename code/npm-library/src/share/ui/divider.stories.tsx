@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import './divider.sass';
 
 import { Divider } from './divider'
 import React from 'react'
@@ -24,7 +25,7 @@ const meta = {
   },
   decorators: Story => {
     return (
-      <div className="1px flex h-20 w-[700px] items-center justify-center border border-gray-200">
+      <div className="container">
         <Story />
       </div>
     )

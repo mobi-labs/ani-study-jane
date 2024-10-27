@@ -1,0 +1,60 @@
+.chat-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .icon {
+    position: relative;
+    display: flex;
+    height: 24px;
+    width: 24px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .text {
+    text-align: center;
+    font-size: 0.875rem;
+  }
+
+  .count {
+    font-size: 0.75rem; 
+    color: #e5e5e5;
+  }
+}
+
+.default-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .icon {
+    display: flex;
+    height: 24px;
+    width: 24px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 1rem; 
+    color: #989898;
+  }
+}
+
+.app-bar {
+  position: relative;
+  display: flex;
+  height: 56px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px; 
+
+  &--line {
+    border-bottom: 1px solid;
+  }
+}

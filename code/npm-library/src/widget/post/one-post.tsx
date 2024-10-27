@@ -1,59 +1,51 @@
-import { ChatOutlined, FavoriteBorderOutlined } from '@mui/icons-material'
-
-import { PostType } from '@/entities/model'
-import { cn } from '@/share/libs'
-import { Divider, Tag } from '@/share/ui'
-import React from 'react'
+import { ChatOutlined, FavoriteBorderOutlined } from '@mui/icons-material';
+import { PostType } from '../../entities/model';
+import { Divider, Tag } from '../../share/ui';
+import React from 'react';
+import './one-post.sass';
+import classNames from 'classnames';
 
 type Props = {
-  post: PostType
-  isDivider: boolean
-  isReverse?: boolean
-}
+  post: PostType;
+  isDivider: boolean;
+  isReverse?: boolean;
+};
 
 export function OnePost({ post, isDivider, isReverse = false }: Props) {
-  const { title, subTitle, tags, like_count, comment_count, img_url } = post
-
-  const reverseItem = img_url && isReverse
+  const { title, subTitle, tags, like_count, comment_count, img_url } = post;
+  const reverseItem = img_url && isReverse;
 
   return (
-    <li className="flex w-full flex-col items-start justify-center gap-[18px]">
-      <div className={cn('flex w-full justify-between', { 'flex-row-reverse': reverseItem })}>
-        <div className={cn('flex flex-col gap-[10px]', { 'items-end': reverseItem })}>
-          <div className="flex gap-1">
-            {tags.map(tag => {
-              {
-                const { id, color, name } = tag
-                return (
-                  <Tag key={id} rectangle={'square'} color={color}>
-                    {name}
-                  </Tag>
-                )
-              }
-            })}
+    <li className="one-post">
+      <div className={classNames('one-post__content', { 'one-post__content--reverse': reverseItem })}>
+        <div className={classNames('one-post__text', { 'one-post__text--reverse': reverseItem })}>
+          <div className="one-post__text__tags">
+            {tags.map(tag => (
+              <Tag key={tag.id} rectangle="square" color={tag.color}>
+                {tag.name}
+              </Tag>
+            ))}
           </div>
-          <div className="overflow-hidden text-ellipsis text-subtitle2 text-text-primary">{title}</div>
-          <div className="overflow-hidden text-ellipsis text-caption2 text-text-paragraph02">{subTitle}</div>
-          <div className="flex gap-[12px] text-text-secondary">
-            <div className="flex items-center">
-              <FavoriteBorderOutlined className="h-5 w-5" />
-              <div className="flex h-[18px] w-[18px] items-center justify-center">{like_count}</div>
+          <div className="one-post__text__title">{title}</div>
+          <div className="one-post__text__subtitle">{subTitle}</div>
+          <div className="one-post__info">
+            <div className="one-post__info__like">
+              <FavoriteBorderOutlined className="icon" />
+              <div className="count">{like_count}</div>
             </div>
-            <div className="flex items-center">
-              <div className="flex items-center gap-[2px]">
-                <ChatOutlined className="h-5 w-5" />
-                <div className="flex h-[18px] w-[18px] items-center justify-center">{comment_count}</div>
-              </div>
+            <div className="one-post__info__comments">
+              <ChatOutlined className="icon" />
+              <div className="count">{comment_count}</div>
             </div>
           </div>
         </div>
         {img_url && (
-          <div className="flex items-center">
-            <div className="bg-grey-scale-3 h-20 w-20 rounded-[10px]" />
+          <div className="one-post__image">
+            <div className="image-placeholder" />
           </div>
         )}
       </div>
-      {isDivider && <Divider thickness={'default'} width={'full'} />}
+      {isDivider && <Divider thickness="default" width="full" />}
     </li>
-  )
+  );
 }

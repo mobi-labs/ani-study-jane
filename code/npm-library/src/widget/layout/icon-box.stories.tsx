@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { IconBox } from '@/widget/layout/icon-box'
+import { IconBox } from '../layout'
 
 const meta = {
   title: 'widget/layout/icon-box',

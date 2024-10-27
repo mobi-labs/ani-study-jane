@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 
-import { AppBar } from '@/widget/layout/app-bar'
+import { AppBar } from './app-bar'
 
 const meta = {
   title: 'widget/layout/app-bar',

@@ -1,50 +1,39 @@
 {
   "name": "npm-library-deploy-test-for-butter",
-  "version": "0.0.0",
-  "main": "./dist/index.js",
-  "module": "./dist/index.es.js",
-  "browser": "./dist/index.umd.js",
-  "types": "./dist/index.d.ts",
+  "version": "1.0.0",
   "private": false,
-  "script": {
+  "description": "library deployment test with npm",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "next dev",
+    "start": "next start",
+    "lint": "next lint",
     "build": "rollup -c"
   },
-  "compilerOptions": {
-    "target": "es5",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "jsx": "react",
-    "module": "ESNext",
-    "declaration": true,
-    "declarationDir": "./dist",
-    "sourceMap": false,
-    "outDir": "./dist",
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "emitDeclarationOnly": true,
-    "removeComments": true
-  },
-  "include": [
-    "./src"
-  ],
-  "exclude": [
-    "./dist",
-    "./node_modules",
-    "./src/**/*.test.tsx",
-    "./src/**/*.stories.tsx"
-  ],
+  "keywords": [],
+  "author": "jane_ham",
+  "license": "ISC",
   "dependencies": {
     "@mui/icons-material": "^6.1.5",
     "@storybook/nextjs": "^8.3.6",
     "@storybook/react": "^8.3.6",
+    "@types/next": "^9.0.0",
+    "classnames": "^2.5.1",
+    "next": "^15.0.1",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "rollup-plugin-peer-deps-external": "^2.2.4"
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "style-inject": "^0.3.0"
   },
   "devDependencies": {
+    "@storybook/preset-scss": "^1.0.3",
     "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1"
+    "@types/react-dom": "^18.3.1",
+    "css-loader": "^7.1.2",
+    "postcss": "^8.4.47",
+    "react-dom": "^18.3.1",
+    "sass": "^1.80.4",
+    "sass-loader": "^16.0.2",
+    "style-loader": "^4.0.0"
   }
 }

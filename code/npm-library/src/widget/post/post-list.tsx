@@ -1,6 +1,7 @@
-import { PostType } from '@/entities/model'
-import { OnePost } from '@/widget/post/one-post'
-import React from 'react'
+import { PostType } from '@/entities/model';
+import { OnePost } from '@/widget/post/one-post';
+import React from 'react';
+import './post-list.sass';
 
 type Props = {
   postList: PostType[]
@@ -8,8 +9,8 @@ type Props = {
 
 export function PostList({ postList }: Props) {
   return (
-    <div className="flex justify-center py-[18px]">
-      <ul className="flex w-full flex-col items-start justify-center gap-[18px] px-5">
+    <div className="post-list-container">
+      <ul>
         {postList.map((post, index) => (
           <OnePost
             key={post.postId}
@@ -20,5 +21,5 @@ export function PostList({ postList }: Props) {
         ))}
       </ul>
     </div>
-  )
+  );
 }

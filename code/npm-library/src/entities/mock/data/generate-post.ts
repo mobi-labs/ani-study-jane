@@ -1,4 +1,4 @@
-import { ColorType, PostType } from '@/entities/model'
+import { ColorType, PostType } from '../../model'
 
 export function generatePost(count: number): PostType[] {
   return Array(count)

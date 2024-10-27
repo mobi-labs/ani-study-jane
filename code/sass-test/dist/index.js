@@ -1,8 +1,18 @@
-'use strict';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 
-var React = require('react');
-var ReactDOM = require('react-dom/client');
-var App = require('./App.js');
+function App() {
+  return React.createElement("div", {
+    className: 'App'
+  }, React.createElement("header", {
+    className: 'App-header'
+  }, React.createElement("p", null, "Edit ", React.createElement("code", null, "src/App.js"), " and save to reload."), React.createElement("a", {
+    className: 'App-link',
+    href: 'https://reactjs.org',
+    target: '_blank',
+    rel: 'noopener noreferrer'
+  }, "Learn React")));
+}
 
 var container = document.getElementById("root");
 var root = ReactDOM.createRoot(container);

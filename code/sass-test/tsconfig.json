@@ -14,7 +14,8 @@
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "emitDeclarationOnly": true,
-    "removeComments": true
+    "removeComments": true,
+    "typeRoots": ["node_modules/@types", "node_modules/your-package-name"]
   },
   "include": ["./src"],
   "exclude": [

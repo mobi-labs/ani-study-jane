@@ -1,4 +1,4 @@
-@import "stories/button.scss";
+@use "stories/button.scss" as *;
 
 body {
   margin: 0;

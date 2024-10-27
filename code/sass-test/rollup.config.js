@@ -10,16 +10,18 @@ import commonjs from "@rollup/plugin-commonjs";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 import peerDepsExternal from "rollup-plugin-peer-deps-external";
-import postcss from "rollup-plugin-postcss";
+import postcss from "rollup-plugin-sass";
+import { createRequire } from "node:module";
 
 const extensions = ["js", "jsx", "ts", "tsx", "mjs"];
 
-const pkg = require("./package.json");
+const requireFile = createRequire(import.meta.url);
+const pkg = requireFile("./package.json");
 
 const config = [
   {
     external: [/node_modules/],
-    input: "./src/index.ts",
+    input: "./src/index.tsx",
     output: [
       {
         dir: "./dist",

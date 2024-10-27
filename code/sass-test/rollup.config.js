@@ -7,12 +7,14 @@
 
 import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
-import resolve from "@rollup/plugin-node-resolve";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 import peerDepsExternal from "rollup-plugin-peer-deps-external";
-import scss from "rollup-plugin-sass";
-import { terser } from "rollup-plugin-terser";
+import postcss from "rollup-plugin-sass";
 import { createRequire } from "node:module";
+import { terser } from "rollup-plugin-terser";
+
+const extensions = ["js", "jsx", "ts", "tsx", "mjs"];
 
 const requireFile = createRequire(import.meta.url);
 const pkg = requireFile("./package.json");
@@ -39,20 +41,26 @@ const config = [
       },
     ],
     plugins: [
+      nodeResolve({ extensions }),
       babel({
         exclude: "node_modules/**",
         extensions,
         include: ["src/**/*"],
-        presets: ["@babel/preset-react"],
       }),
       commonjs({ include: "node_modules/**" }),
-      resolve(),
       peerDepsExternal(),
       typescript({ tsconfig: "./tsconfig.json" }),
-      scss({
+      postcss({
+        extract: false,
+        inject: true,
         output: true,
-        failOnError: true,
         outputStyle: "compressed",
+        modules: true,
+        sourceMap: false,
+        use: ["sass"],
+        options: {
+          includePaths: ["src"],
+        },
       }),
       terser(),
     ],

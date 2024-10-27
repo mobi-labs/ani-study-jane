@@ -7,13 +7,12 @@
 
 import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
-import { nodeResolve } from "@rollup/plugin-node-resolve";
+import resolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 import peerDepsExternal from "rollup-plugin-peer-deps-external";
-import postcss from "rollup-plugin-sass";
+import scss from "rollup-plugin-sass";
+import { terser } from "rollup-plugin-terser";
 import { createRequire } from "node:module";
-
-const extensions = ["js", "jsx", "ts", "tsx", "mjs"];
 
 const requireFile = createRequire(import.meta.url);
 const pkg = requireFile("./package.json");
@@ -21,7 +20,7 @@ const pkg = requireFile("./package.json");
 const config = [
   {
     external: [/node_modules/],
-    input: "./src/index.tsx",
+    input: "./src/index.ts",
     output: [
       {
         dir: "./dist",
@@ -40,27 +39,22 @@ const config = [
       },
     ],
     plugins: [
-      nodeResolve({ extensions }),
       babel({
         exclude: "node_modules/**",
         extensions,
         include: ["src/**/*"],
+        presets: ["@babel/preset-react"],
       }),
       commonjs({ include: "node_modules/**" }),
+      resolve(),
       peerDepsExternal(),
       typescript({ tsconfig: "./tsconfig.json" }),
-      postcss({
-        extract: false,
-        inject: true,
+      scss({
         output: true,
+        failOnError: true,
         outputStyle: "compressed",
-        modules: true,
-        sourceMap: false,
-        use: ["sass"],
-        options: {
-          includePaths: ["src"],
-        },
       }),
+      terser(),
     ],
   },
 ];
